@@ -9,26 +9,23 @@ let
   ) {
     inherit pkgs;
   };
+  easy-purescript-nix = pkgs: import (
+    pkgs.fetchFromGitHub {
+      owner = "justinwoo";
+      repo = "easy-purescript-nix";
+      rev = "cc7196bff3fdb5957aabfe22c3fa88267047fe88";
+      sha256 = "1xfl7rnmmcm8qdlsfn3xjv91my6lirs5ysy01bmyblsl10y2z9iw";
+    }
+  ) {
+    inherit pkgs;
+  };
 
 in
 { pkgs ? import <nixpkgs> {}
 , dhall-json ? (easy-dhall-nix pkgs).dhall-json-simple
 , nodejs ? pkgs.nodejs-10_x
+, spago ? (easy-purescript-nix pkgs).spago
 }:
-
-  let
-    easy-purescript-nix = import (
-      pkgs.fetchFromGitHub {
-        owner = "justinwoo";
-        repo = "easy-purescript-nix";
-        rev = "cc7196bff3fdb5957aabfe22c3fa88267047fe88";
-        sha256 = "1xfl7rnmmcm8qdlsfn3xjv91my6lirs5ysy01bmyblsl10y2z9iw";
-      }
-    ) {
-      inherit pkgs;
-    };
-
-  in
     pkgs.stdenv.mkDerivation {
       name = "spago2nix";
 
@@ -49,7 +46,7 @@ in
           --prefix PATH : ${pkgs.lib.makeBinPath [
         pkgs.coreutils
         pkgs.nix-prefetch-git
-        easy-purescript-nix.spago
+        spago
         dhall-json
       ]}
       '';
